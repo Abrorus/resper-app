@@ -13,11 +13,9 @@
 
     {{-- Navigasi samping --}}
     <aside class="flex min-w-0 items-center gap-4 overflow-x-auto bg-[#0b3d31] px-4 py-3 text-[#b5ccc4] md:sticky md:top-0 md:h-screen md:flex-col md:items-stretch md:gap-7 md:px-4 md:py-6" aria-label="Navigasi">
-        <a href="#atas" data-aksi="laporan" class="flex shrink-0 items-center gap-2.5 px-2 font-['Bricolage_Grotesque',sans-serif] text-2xl font-extrabold tracking-tight text-white">
-            <span class="grid h-9 w-9 place-items-center rounded-lg bg-[#e6a417] text-[#0b3d31]" aria-hidden="true">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 11h16a8 8 0 0 1-16 0Z"/><path d="M9 4c0 2 1.5 2 1.5 4M13.5 4c0 2 1.5 2 1.5 4"/></svg>
-            </span>
-            Resper
+                <a href="#atas" data-aksi="laporan" class="flex shrink-0 items-center gap-2 px-2 text-white">
+            <svg class="h-7 w-7 text-[#27AE60]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 4 12l7 7"/><path d="M20 5l-7 7 7 7"/></svg>
+            <span class="text-xl font-bold tracking-wide">RESPER</span>
         </a>
 
         <nav class="flex gap-0.5 md:flex-col">
