@@ -45,12 +45,12 @@ RESPER mengintegrasikan manajemen akun, pemesanan (offline dan pihak ketiga), in
 
 | Komponen | Pilihan | Keterangan |
 |---|---|---|
-| Bahasa | PHP 8.5 | Minimal 8.4.1, karena `composer.lock` memakai komponen Symfony 8 |
-| Framework | Laravel 13 | Pola MVC, template Blade |
+| Bahasa | PHP 8.5 | Minimal 8.4.1, karena `composer.lock` memakai komponen Symfony 8 (dicek otomatis oleh `vendor/composer/platform_check.php`) |
+| Framework | Laravel 13 (terkunci di 13.39) | Pola MVC, template Blade |
 | Database | MySQL / MariaDB | Struktur tabel hanya lewat migration |
-| CSS | Tailwind CSS 4 | Satu framework CSS untuk seluruh aplikasi |
-| Build tool frontend | Vite | Mengolah CSS dan JS, dijalankan dengan `npm run dev` |
-| Dependensi | Composer (PHP), npm (Node.js) | Node.js 22 atau lebih baru |
+| CSS | Tailwind CSS 4 (terkunci di 4.3) | Satu framework CSS untuk seluruh aplikasi |
+| Build tool frontend | Vite 8 (terkunci di 8.3) | Mengolah CSS, JS, dan font |
+| Dependensi | Composer (PHP), npm (Node.js) | **Node.js minimal 22.13**, karena `concurrently` dan `@laravel/multiplex` (dipakai `composer run dev`) mensyaratkannya |
 | Version control | Git + GitHub | Repo `Abrorus/resper-app` |
 | Pengelola database | Bebas (DBeaver, phpMyAdmin, TablePlus) | Hanya untuk melihat data, bukan mengubah struktur |
 
@@ -66,9 +66,10 @@ Cek dulu versi yang sudah terpasang:
 php -v
 composer -V
 node -v
+npm -v
 ```
 
-`php -v` harus menunjukkan 8.4 atau 8.5. `composer -V` juga menampilkan versi PHP yang dipakai Composer, pastikan sama.
+`php -v` harus menunjukkan 8.4.1 ke atas (tim memakai 8.5). `composer -V` juga menampilkan versi PHP yang dipakai Composer, pastikan sama. `node -v` harus 22.13 ke atas. Kalau Node.js masih versi lama, perbarui dulu (misalnya lewat nvm, atau installer LTS dari nodejs.org).
 
 ### Windows
 
@@ -83,7 +84,13 @@ Pasang juga **Node.js 22 LTS** dari nodejs.org dan **Git** dari git-scm.com.
 
 ### Ubuntu
 
-Ubuntu 26.04 (Resolute) tidak lagi didukung PPA `ondrej/php`. Gunakan repositori `packages.sury.org`:
+Ubuntu 26.04 (Resolute) tidak lagi didukung PPA `ondrej/php` (`apt update` akan error 404 "does not have a Release file"). Gunakan repositori `packages.sury.org`. Kalau sebelumnya sudah sempat menambahkan PPA, hapus dulu file sumbernya:
+
+```bash
+sudo rm -f /etc/apt/sources.list.d/ondrej-ubuntu-php-resolute.sources
+```
+
+Lalu tambahkan repositori Sury dan pasang PHP:
 
 ```bash
 sudo apt install -y curl ca-certificates
@@ -103,7 +110,7 @@ sudo apt install php8.5 php8.5-{cli,common,mbstring,xml,curl,zip,bcmath,mysql,sq
 sudo update-alternatives --set php /usr/bin/php8.5
 ```
 
-Untuk Ubuntu 24.04 ke bawah, cara lama dengan `sudo add-apt-repository ppa:ondrej/php` masih bisa dipakai.
+Untuk Ubuntu 24.04 ke bawah, cara lama dengan `sudo add-apt-repository ppa:ondrej/php` masih bisa dipakai. Kalau ada beberapa versi PHP terpasang (misalnya 8.2 dan 8.5), pilih versi aktif dengan `sudo update-alternatives --config php`.
 
 Pasang Composer lewat installer resmi, **bukan** `apt install composer` (versi apt ikut menarik PHP bawaan Ubuntu):
 
@@ -205,7 +212,15 @@ Seeder membuat akun uji: email `test@example.com`, password `password`.
 
 ### f. Jalankan aplikasi
 
-Buka **dua terminal** di folder proyek:
+Cara paling praktis, cukup **satu terminal**:
+
+```bash
+composer run dev
+```
+
+Perintah ini menjalankan `php artisan dev`, yang menyalakan sekaligus web server (`php artisan serve`), Vite (`npm run dev`), queue worker, dan penampil log (`pail`, khusus Linux/macOS). Hentikan semuanya dengan `Ctrl+C`.
+
+Alternatif kalau `composer run dev` error (biasanya karena Node.js di bawah 22.13), buka **dua terminal**:
 
 ```bash
 # Terminal 1
@@ -218,6 +233,8 @@ php artisan serve
 ```
 
 Buka `http://127.0.0.1:8000`. Halaman login ada di `http://127.0.0.1:8000/login`.
+
+> **Tentang `composer run setup`:** repo juga punya skrip `setup` (install dependensi, membuat `.env`, `key:generate`, `migrate`, lalu `npm run build`). Skrip ini **belum disarankan** untuk anggota baru, karena `.env.example` masih default SQLite sehingga langkah `migrate` di dalamnya akan gagal. Gunakan langkah manual a sampai e di atas sampai `.env.example` diubah ke MySQL (lihat bagian 10).
 
 ---
 
@@ -240,7 +257,7 @@ git switch feature/nama-package
 git merge main
 ```
 
-Lalu jalankan `npm run dev` dan `php artisan serve` seperti biasa.
+Lalu jalankan `composer run dev` (atau `npm run dev` dan `php artisan serve` di dua terminal) seperti biasa.
 
 ---
 
@@ -385,8 +402,10 @@ Gunakan bahasa Indonesia, kalimat perintah, dan spesifik:
 | "Database file at path [...database.sqlite] does not exist" | `.env` masih `DB_CONNECTION=sqlite` atau baris DB masih diawali `#` | Perbaiki `.env` (bagian 4d), simpan file, lalu `php artisan config:clear` dan restart `php artisan serve` |
 | DBeaver: "Connection refused" | Server MySQL/MariaDB belum berjalan | Ubuntu: `sudo systemctl enable --now mariadb`. Windows: start MySQL di XAMPP/Laragon |
 | DBeaver: "Access denied for user 'root'@'localhost'" (Ubuntu) | `root` MariaDB di Ubuntu hanya bisa lewat `sudo mysql` | Buat user khusus (bagian 4c) |
+| "Table 'resper.sessions' doesn't exist" | Koneksi MySQL sudah benar, tetapi tabel belum dibuat | `php artisan migrate` |
 | "View [x.y] not found" | Nama atau lokasi file view tidak sesuai | `view('auth.login')` harus berada di `resources/views/auth/login.blade.php` |
-| "Vite manifest not found" | `npm run dev` belum dijalankan | Jalankan `npm run dev` di terminal terpisah |
+| "Vite manifest not found at .../public/build/manifest.json" | Vite tidak sedang berjalan | Jalankan `composer run dev`, atau `npm run dev` di terminal terpisah |
+| `composer run dev` gagal, menyebut `@laravel/multiplex` atau `concurrently` | Node.js di bawah 22.13 | Perbarui Node.js, atau pakai cara dua terminal |
 | Perubahan `.env` tidak berpengaruh | File belum disimpan atau konfigurasi ter-cache | Simpan file (`Ctrl+S`), `php artisan config:clear`, restart server |
 | Tabel di DBeaver tidak muncul setelah migrate | Tampilan DBeaver belum diperbarui | Klik kanan database > Refresh |
 
@@ -421,7 +440,7 @@ Hal-hal berikut perlu disepakati di grup. Setelah diputuskan, perbarui bagian in
       "php": "8.4.1"
   }
   ```
-- [ ] Jadikan Poppins font global di `resources/css/app.css` (saat ini baru dimuat di halaman login).
+- [ ] Jadikan Poppins font global. Saat ini font bawaan proyek (Instrument Sans) dimuat lewat bagian `fonts` di `vite.config.js` dan dipakai di `@theme` pada `resources/css/app.css`, sedangkan Poppins baru dimuat manual di halaman login. Ganti keduanya ke Poppins supaya semua halaman otomatis memakainya.
 - [ ] Buat migration bersama untuk entitas inti dari Domain Model CDR (users + role, inventories, orders, order_items, staff, schedules, transactions) di branch `feature/database-schema`, lalu merge ke `main` sebelum fitur lain berkembang jauh.
 
 ### Celah logika di spesifikasi package Akun (CDR)
