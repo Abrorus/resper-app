@@ -342,6 +342,57 @@ php artisan migrate:status               # cek migration yang sudah jalan
 
 ## 8. Alur Kerja Git
 
+### Mengenal Git dan GitHub
+
+**Git** adalah alat yang mencatat riwayat perubahan kode di laptopmu. **GitHub** adalah tempat menyimpan salinan riwayat itu secara online, supaya kelima anggota bisa berbagi kode. Git bekerja di laptop (bisa tanpa internet), GitHub hanya dihubungi saat kita mengirim (`push`) atau mengambil (`pull`/`fetch`) perubahan.
+
+Bayangkan perubahan kode melewati tiga "tempat" sebelum sampai ke GitHub:
+
+```
+Folder kerja  ──git add──▶  Staging  ──git commit──▶  Repo lokal  ──git push──▶  GitHub
+(file yang kamu edit)       (yang siap dicatat)       (riwayat di laptop)        (dibagikan ke tim)
+```
+
+### Istilah yang akan sering dipakai
+
+| Istilah | Artinya |
+|---|---|
+| **Repository (repo)** | Folder proyek beserta seluruh riwayat perubahannya. Repo kita: `Abrorus/resper-app` |
+| **Clone** | Mengunduh repo dari GitHub ke laptop untuk pertama kali (`git clone`) |
+| **Commit** | "Titik simpan" berisi sekumpulan perubahan dan pesan penjelasannya. Bisa dikembalikan kapan saja |
+| **Branch** | Jalur kerja terpisah. Perubahan di branch-mu tidak memengaruhi branch lain sampai digabungkan |
+| **`main`** | Branch utama yang berisi kode stabil dan menjadi dasar semua branch fitur |
+| **Remote / `origin`** | Sebutan untuk repo di GitHub. `origin/main` artinya branch `main` versi GitHub |
+| **Push** | Mengirim commit dari laptop ke GitHub |
+| **Fetch** | Mengambil info terbaru dari GitHub **tanpa** mengubah file di laptop |
+| **Pull** | Fetch sekaligus menggabungkan perubahan terbaru ke branch yang sedang aktif |
+| **Merge** | Menggabungkan perubahan dari satu branch ke branch lain |
+| **Pull Request (PR)** | Permintaan di GitHub untuk menggabungkan branch-mu ke `main`, lengkap dengan review dari anggota lain |
+| **Merge conflict** | Terjadi saat dua orang mengubah baris yang sama di file yang sama. Git tidak bisa memutuskan sendiri, jadi kita pilih manual |
+| **`.gitignore`** | Daftar file yang tidak boleh ikut ke Git, misalnya `.env`, `vendor/`, `node_modules/` |
+| **Collaborator** | Anggota yang diberi izin push oleh pemilik repo di GitHub |
+
+### Perintah sehari-hari
+
+| Perintah | Kegunaan |
+|---|---|
+| `git status` | Melihat branch aktif dan file apa saja yang berubah. **Jalankan sesering mungkin** |
+| `git diff` | Melihat detail baris yang berubah dan belum di-staging |
+| `git diff --staged` | Melihat perubahan yang sudah di-staging dan siap di-commit |
+| `git add <file>` | Memasukkan file ke staging. Hindari `git add .` kalau belum yakin isi `git status` |
+| `git commit -m "pesan"` | Mencatat perubahan yang sudah di-staging |
+| `git log --oneline --graph` | Melihat riwayat commit secara ringkas |
+| `git branch -a` | Melihat semua branch, termasuk yang ada di GitHub |
+| `git switch <branch>` | Pindah ke branch lain |
+| `git switch -c <branch>` | Membuat branch baru sekaligus pindah ke sana |
+| `git fetch origin` | Mengambil info terbaru dari GitHub |
+| `git pull` | Mengambil dan menggabungkan perubahan terbaru ke branch aktif |
+| `git push` | Mengirim commit ke GitHub (pertama kali: `git push -u origin <branch>`) |
+| `git merge main` | Menggabungkan `main` terbaru ke branch-mu |
+| `git stash` / `git stash pop` | Menyimpan sementara perubahan yang belum di-commit, lalu mengembalikannya |
+
+VS Code juga menyediakan fitur Git lewat ikon **Source Control** di sidebar kiri (`Ctrl+Shift+G`). Di sana kamu bisa melihat file yang berubah, staging dengan tombol `+`, menulis pesan commit, dan push. Hasilnya sama dengan perintah terminal di atas, pilih yang paling nyaman.
+
 ### Aturan utama
 
 1. **Jangan pernah push langsung ke `main`.** `main` harus selalu berisi kode yang bisa dijalankan.
@@ -390,6 +441,48 @@ Gunakan bahasa Indonesia, kalimat perintah, dan spesifik:
 
 - Baik: `Tambah validasi email pada form login`
 - Kurang baik: `update`, `fix`, `coba lagi`
+
+Satu commit sebaiknya berisi satu perubahan yang utuh. Lebih baik sering commit dengan perubahan kecil daripada satu commit besar di akhir hari, karena lebih mudah direview dan dikembalikan kalau ada masalah.
+
+### Menyelesaikan merge conflict
+
+Conflict biasanya muncul saat `git merge main` atau `git pull`, kalau kamu dan anggota lain mengubah baris yang sama (yang paling sering: `routes/web.php`). Git akan menandai bagian yang bentrok di dalam file seperti ini:
+
+```
+<<<<<<< HEAD
+Route::get('/login', [LoginController::class, 'create']);
+=======
+Route::get('/inventaris', [InventoryController::class, 'index']);
+>>>>>>> main
+```
+
+Bagian atas (`HEAD`) adalah versimu, bagian bawah adalah versi yang masuk. Cara menyelesaikannya:
+
+1. Buka file tersebut di VS Code. Di atas setiap conflict ada pilihan **Accept Current Change** (pakai versimu), **Accept Incoming Change** (pakai versi masuk), atau **Accept Both Changes** (pakai keduanya).
+2. Untuk `routes/web.php`, biasanya yang benar adalah **Accept Both Changes**, karena route dari dua package memang harus ada semua.
+3. Pastikan tidak ada lagi tanda `<<<<<<<`, `=======`, atau `>>>>>>>` yang tersisa, lalu cek aplikasi masih berjalan.
+4. Selesaikan dengan:
+
+```bash
+git add <file-yang-conflict>
+git commit
+```
+
+Kalau bingung atau takut salah, batalkan proses merge dengan `git merge --abort` (semua kembali seperti sebelum merge), lalu minta bantuan di grup. Conflict bisa dikurangi dengan rutin menjalankan `git merge main` ke branch-mu, sehingga perbedaan tidak menumpuk.
+
+### Kalau terlanjur salah
+
+| Situasi | Solusi |
+|---|---|
+| Ingin membatalkan perubahan pada file yang **belum** di-commit | `git restore <file>` (perubahan hilang permanen, hati-hati) |
+| Terlanjur `git add` file yang salah | `git restore --staged <file>` (file keluar dari staging, isinya tetap) |
+| Pesan commit terakhir salah, **belum** di-push | `git commit --amend -m "pesan baru"` |
+| Commit terakhir salah isi, **belum** di-push | `git reset --soft HEAD~1` (commit dibatalkan, perubahan tetap ada di staging) |
+| Commit salah **sudah** di-push | `git revert <id-commit>` (membuat commit baru yang membalikkan perubahan, aman untuk tim) |
+| Terlanjur commit file `.env` | Segera kabari grup. Hapus dari Git dengan `git rm --cached .env`, commit, dan **ganti password database** karena sudah terlanjur terlihat di riwayat |
+| Sedang mengerjakan sesuatu tapi harus pindah branch | `git stash`, pindah branch, lalu kembali dan `git stash pop` |
+
+**Jangan pernah memakai `git push --force`** pada branch yang dipakai bersama, terutama `main`, karena bisa menghapus commit anggota lain secara permanen.
 
 ---
 
