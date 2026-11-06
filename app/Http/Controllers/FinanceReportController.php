@@ -21,13 +21,7 @@ class FinanceReportController extends Controller
             'transaksi' => $transaksi,
             'periodeData' => $awalData->format('d/m/Y') . ' sampai ' . (new DateTimeImmutable($hariIni))->format('d/m/Y'),
             'kategori' => ['Bahan baku', 'Gaji', 'Utilitas', 'Perawatan'],
-            'metodeBayar' => ['Tunai', 'QRIS', 'Kartu debit'],
-            'subKeuangan' => [
-                ['nama' => 'Transaksi Penjualan', 'aksi' => 'penjualan'],
-                ['nama' => 'Transaksi Pengeluaran', 'aksi' => 'pengeluaran'],
-                ['nama' => 'Laporan Keuangan', 'aksi' => 'laporan'],
-                ['nama' => 'Koreksi Transaksi', 'aksi' => 'koreksi'],
-            ],
+            'metodeBayar' => ['Tunai', 'QRIS', 'Kartu debit']
         ]);
     }
 
