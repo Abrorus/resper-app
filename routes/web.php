@@ -1,16 +1,17 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\FinanceReportController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => redirect()->route('dashboard'));
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
-});
+require __DIR__.'/auth.php';
 
-Route::get('/finance-report', [FinanceReportController::class, 'index'])->name('finance.report');
+Route::middleware('auth')->prefix('dashboard')->group(function () {
+    Route::get('/', fn () => redirect()->route('finance.report'))->name('dashboard');
+
+    require __DIR__.'/modules/akun.php';
+    require __DIR__.'/modules/pemesanan.php';
+    require __DIR__.'/modules/inventaris.php';
+    require __DIR__.'/modules/staff.php';
+    require __DIR__.'/modules/keuangan.php';
+});

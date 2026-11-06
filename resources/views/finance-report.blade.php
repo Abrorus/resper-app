@@ -1,58 +1,8 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laporan Keuangan | RESPER</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=bricolage-grotesque:500,600,700,800|instrument-sans:400,500,600" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-[#f1f4f2] font-sans text-[15px] text-[#13211e] antialiased">
-<div class="min-h-screen md:grid md:grid-cols-[252px_1fr]">
+@extends('layouts.app')
 
-    {{-- Navigasi samping --}}
-    <aside class="flex min-w-0 items-center gap-4 overflow-x-auto bg-[#0b3d31] px-4 py-3 text-[#b5ccc4] md:sticky md:top-0 md:h-screen md:flex-col md:items-stretch md:gap-7 md:px-4 md:py-6" aria-label="Navigasi">
-                <a href="#atas" data-aksi="laporan" class="flex shrink-0 items-center gap-2 px-2 text-white">
-            <svg class="h-7 w-7 text-[#27AE60]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 4 12l7 7"/><path d="M20 5l-7 7 7 7"/></svg>
-            <span class="text-xl font-bold tracking-wide">RESPER</span>
-        </a>
+@section('title', 'Laporan Keuangan')
 
-        <nav class="flex gap-0.5 md:flex-col">
-            <a href="#" data-modul="Akun" class="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#12503f] hover:text-white">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Akun
-            </a>
-            <a href="#" data-modul="Pemesanan" class="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#12503f] hover:text-white">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6"/></svg>Pemesanan
-            </a>
-            <a href="#" data-modul="Inventaris" class="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#12503f] hover:text-white">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 3 7.5l9 4.5 9-4.5Z"/><path d="M3 7.5V17l9 4.5 9-4.5V7.5M12 12v9.5"/></svg>Inventaris
-            </a>
-            <a href="#" data-modul="Staff" class="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#12503f] hover:text-white">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/></svg>Staff
-            </a>
-            <a href="#atas" data-aksi="laporan" class="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 font-semibold text-white hover:bg-[#12503f]">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg>Keuangan
-            </a>
-            <div class="mb-1.5 ml-5 mt-1 hidden flex-col border-l border-white/15 pl-5 md:flex">
-                @foreach ($subKeuangan as $sub)
-                    <a href="#" data-aksi="{{ $sub['aksi'] }}"
-                       @if ($sub['aksi'] === 'laporan') aria-current="page" @endif
-                       class="rounded-lg px-2.5 py-2 text-[0.92rem] hover:bg-[#12503f] hover:text-white aria-[current=page]:bg-[#e6a417]/15 aria-[current=page]:font-semibold aria-[current=page]:text-white aria-[current=page]:shadow-[inset_3px_0_0_#e6a417]">{{ $sub['nama'] }}</a>
-                @endforeach
-            </div>
-        </nav>
-
-        <div class="mt-auto hidden items-center gap-3 rounded-xl bg-white/5 p-3 md:flex">
-            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e9efe9] font-bold text-[#0b3d31]" aria-hidden="true">MR</div>
-            <div>
-                <b class="block font-semibold text-white">Manajer Restoran</b>
-                <small class="text-[0.82rem]">Akses penuh keuangan</small>
-            </div>
-        </div>
-    </aside>
-
-    <main id="atas" class="w-full min-w-0 max-w-[1240px] px-4 pb-10 pt-5 md:px-10 md:pb-14 md:pt-7">
+@section('content')
         <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]"><a href="#atas" id="crumb-keuangan" class="hover:text-[#13211e] hover:underline">Keuangan</a> / Laporan Keuangan</p>
 
         {{-- Kepala halaman dan filter periode --}}
@@ -194,9 +144,9 @@
             <span>Data contoh {{ $periodeData }}, belum terhubung ke database. Koreksi disimpan di browser ini.</span>
             <button type="button" id="btn-data-awal" class="cursor-pointer text-[#13211e] underline">Kembalikan data awal</button>
         </p>
-    </main>
-</div>
+@endsection
 
+@push('modals')
 {{-- Formulir koreksi transaksi (use case Keuangan-4) --}}
 <dialog id="dialog-koreksi" aria-labelledby="judul-koreksi" class="m-auto w-[min(460px,calc(100vw-32px))] rounded-2xl p-0 text-[#13211e] shadow-2xl backdrop:bg-[#0b1e19]/45">
     <form id="form-koreksi" class="flex flex-col gap-3.5 px-6.5 pb-5.5 pt-6.5" novalidate>
@@ -224,6 +174,9 @@
 
 <div id="tip" hidden class="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-[calc(100%+12px)] whitespace-nowrap rounded-md bg-[#13211e] px-2.5 py-1.5 text-[0.85rem] text-white"></div>
 <div id="toasts" aria-live="polite" class="fixed inset-x-4 bottom-5 z-[60] flex flex-col items-stretch gap-2 md:left-auto md:right-5 md:items-end"></div>
+@endpush
+
+@push('scripts')
 <script>
 (function () {
     const DATA_AWAL = @json($transaksi);
@@ -730,10 +683,6 @@
         $('#riwayat').scrollIntoView({ block: 'start' });
         $('#riwayat').focus({ preventScroll: true });
     }
-    document.querySelectorAll('[data-modul]').forEach(a => a.addEventListener('click', e => {
-        e.preventDefault();
-        toast('Modul ' + a.dataset.modul + ' dikerjakan anggota kelompok lain dan belum tersedia di halaman ini.');
-    }));
     document.querySelectorAll('[data-aksi]').forEach(a => a.addEventListener('click', e => {
         e.preventDefault();
         const aksi = a.dataset.aksi;
@@ -770,5 +719,4 @@
     render();
 })();
 </script>
-</body>
-</html>
+@endpush
