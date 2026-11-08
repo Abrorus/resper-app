@@ -2,16 +2,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Staff\StaffController;
 
-// Halaman utama Laravel
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', fn () => redirect()->route('dashboard'));
+
+require __DIR__.'/auth.php';
+
+Route::middleware('auth')->prefix('dashboard')->group(function () {
+    Route::get('/', fn () => redirect()->route('finance.report'))->name('dashboard');
+
+    require __DIR__.'/modules/akun.php';
+    require __DIR__.'/modules/pemesanan.php';
+    require __DIR__.'/modules/inventaris.php';
+    require __DIR__.'/modules/staff.php';
+    require __DIR__.'/modules/keuangan.php';
 });
-
-// Halaman Staff Management
-Route::get('/staff', [StaffController::class, 'index'])
-    ->name('staff.index');
-// Staff Schedule
-Route::get('/staff/schedule', [StaffController::class, 'schedule'])
-    ->name('staff.schedule');
