@@ -1,20 +1,17 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => redirect()->route('dashboard'));
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
-});
+require __DIR__.'/auth.php';
 
-Route::get('/inventaris', [InventoryController::class, 'index'])->name('inventory.index');
-Route::post('/inventaris', [InventoryController::class, 'store'])->name('inventory.store');
-Route::get('/inventaris/{inventory}', [InventoryController::class, 'show'])->name('inventory.show');
-Route::put('/inventaris/{inventory}', [InventoryController::class, 'update'])->name('inventory.update');
-Route::delete('/inventaris/{inventory}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
+Route::middleware('auth')->prefix('dashboard')->group(function () {
+    Route::get('/', fn () => redirect()->route('finance.report'))->name('dashboard');
+
+    require __DIR__.'/modules/akun.php';
+    require __DIR__.'/modules/pemesanan.php';
+    require __DIR__.'/modules/inventaris.php';
+    require __DIR__.'/modules/staff.php';
+    require __DIR__.'/modules/keuangan.php';
+});
