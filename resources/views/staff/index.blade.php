@@ -1,27 +1,12 @@
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.app')
 
-    <title>Staff Management - RESPER</title>
+@section('title', 'Staff Management')
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+@section('content')
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+<main class="max-w-6xl mx-auto p-8">
 
-<body class="bg-gray-50 min-h-screen"
-      style="font-family: 'Poppins', sans-serif;">
-
-    <header class="bg-white shadow-sm p-6">
-        <h1 class="text-2xl font-bold text-[#27AE60]">
-            RESPER
-        </h1>
-    </header>
-
-    <main class="max-w-6xl mx-auto p-8">
 
         <h2 class="text-2xl font-bold mb-2">
             Data Staff Restaurant
@@ -188,5 +173,4 @@
     </div>
 </dialog>
 
-</body>
-</html>
+@endsection

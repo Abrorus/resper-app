@@ -1,29 +1,10 @@
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Staff Schedule')
 
-    <title>Staff Schedule - RESPER</title>
+@section('content')
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-
-<body class="bg-gray-50 min-h-screen"
-      style="font-family: 'Poppins', sans-serif;">
-
-    <!-- HEADER -->
-    <header class="bg-white shadow-sm p-6">
-        <h1 class="text-2xl font-bold text-[#27AE60]">
-            RESPER
-        </h1>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto p-8">
+<main class="max-w-6xl mx-auto p-8">
 
         <div class="mb-6">
             <h2 class="text-2xl font-bold mb-2">
@@ -266,7 +247,6 @@
 
         </div>
 
-    </dialog>
+        </dialog>
 
-</body>
-</html>
+@endsection
