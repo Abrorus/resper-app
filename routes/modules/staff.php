@@ -1,6 +1,11 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Staff\StaffController;
 
-Route::view('/staff', 'placeholder', ['modul' => 'Staff', 'judul' => 'Data Staff'])->name('staff.index');
-Route::view('/staff/schedule', 'placeholder', ['modul' => 'Staff', 'judul' => 'Jadwal Staff'])->name('staff.schedule');
+Route::get('/staff', [StaffController::class, 'index'])
+    ->name('staff.index');
+
+Route::get('/staff/schedule', [StaffController::class, 'schedule'])
+    ->name('staff.schedule');
