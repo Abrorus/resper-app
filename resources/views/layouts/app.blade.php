@@ -13,7 +13,7 @@
 <div class="min-h-screen md:grid md:grid-cols-[252px_1fr]">
     @include('partials.sidebar')
 
-    <main id="atas" class="w-full min-w-0 max-w-[1240px] px-4 pb-10 pt-5 md:px-10 md:pb-14 md:pt-7">
+    <main id="atas" class="w-full min-w-0 px-4 pb-10 pt-5 md:px-10 md:pb-14 md:pt-7">
         @yield('content')
     </main>
 </div>
