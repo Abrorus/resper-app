@@ -42,6 +42,7 @@
 
         </div>
 
+        @can('kelola-jadwal')
         <!-- ADD SCHEDULE BUTTON -->
         <div class="flex justify-end mb-5">
 
@@ -52,8 +53,8 @@
             >
                 + Add Schedule
             </button>
-
         </div>
+        @endcan
 
         <!-- SCHEDULE TABLE -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">

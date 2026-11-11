@@ -3,33 +3,60 @@
 
     $menu = [
         ['label' => 'Akun', 'route' => 'akun.index', 'pola' => 'akun.*',
-         'ikon' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'],
-        ['label' => 'Pemesanan', 'route' => 'order.pesanan', 'pola' => 'order.*',
+         'ikon' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+         'sub' => [
+             ['label' => 'Profil', 'route' => 'akun.index'],
+             ['label' => 'Kelola Role', 'route' => 'akun.role.index', 'izin' => 'kelola-role'],
+         ]],
+        ['label' => 'Pemesanan', 'route' => 'order.pesanan', 'pola' => 'order.*', 'izin' => 'kelola-pesanan',
          'ikon' => '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6"/>',
          'sub' => [
              ['label' => 'Pesanan', 'route' => 'order.pesanan'],
              ['label' => 'Delivery Order', 'route' => 'order.delivery'],
          ]],
-        ['label' => 'Inventaris', 'route' => 'inventory.index', 'pola' => 'inventory.*',
+        ['label' => 'Inventaris', 'route' => 'inventory.index', 'pola' => 'inventory.*', 'izin' => 'kelola-inventaris',
          'ikon' => '<path d="M12 3 3 7.5l9 4.5 9-4.5Z"/><path d="M3 7.5V17l9 4.5 9-4.5V7.5M12 12v9.5"/>'],
         ['label' => 'Staff', 'route' => 'staff.index', 'pola' => 'staff.*',
          'ikon' => '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/>',
          'sub' => [
-             ['label' => 'Data Staff', 'route' => 'staff.index'],
-             ['label' => 'Jadwal Staff', 'route' => 'staff.schedule'],
+             ['label' => 'Data Staff', 'route' => 'staff.index', 'izin' => 'kelola-staf'],
+             ['label' => 'Jadwal Staff', 'route' => 'staff.schedule', 'izin' => 'lihat-jadwal'],
          ]],
-        ['label' => 'Keuangan', 'route' => 'finance.report', 'pola' => 'finance.*',
+        ['label' => 'Keuangan', 'route' => 'finance.report', 'pola' => 'finance.*', 'izin' => 'lihat-laporan-keuangan',
          'ikon' => '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>',
          'sub' => [
              ['label' => 'Transaksi Penjualan', 'route' => 'finance.report', 'aksi' => 'penjualan'],
              ['label' => 'Transaksi Pengeluaran', 'route' => 'finance.report', 'aksi' => 'pengeluaran'],
              ['label' => 'Laporan Keuangan', 'route' => 'finance.report'],
-             ['label' => 'Koreksi Transaksi', 'route' => 'finance.report', 'aksi' => 'koreksi'],
+             ['label' => 'Koreksi Transaksi', 'route' => 'finance.report', 'aksi' => 'koreksi', 'izin' => 'koreksi-transaksi'],
          ]],
     ];
 
+    // Item tanpa 'izin' selalu tampil, item dengan 'izin' dicek lewat Gate
+    $boleh = fn (array $x): bool => ! isset($x['izin']) || (bool) auth()->user()?->can($x['izin']);
+
+    $menu = collect($menu)
+        ->filter($boleh)
+        ->map(function (array $item) use ($boleh) {
+            if (! empty($item['sub'])) {
+                $item['sub'] = array_values(array_filter($item['sub'], $boleh));
+
+                if ($item['sub'] === []) {
+                    return null;
+                }
+
+                // Link induk diarahkan ke sub-menu pertama yang boleh dibuka
+                $item['route'] = $item['sub'][0]['route'];
+            }
+
+            return $item;
+        })
+        ->filter()
+        ->values()
+        ->all();
+
     $tautan = fn ($nama, $aksi = null) => Route::has($nama) ? route($nama) . ($aksi ? '#' . $aksi : '') : '#';
-    $namaUser = auth()->user()?->name ?? 'Manajer Restoran';
+    $namaUser = auth()->user()?->name ?? 'Pengguna';
 @endphp
 
 <aside class="flex min-w-0 items-center gap-4 overflow-x-auto bg-[#0b3d31] px-4 py-3 text-[#b5ccc4] md:sticky md:top-0 md:h-screen md:flex-col md:items-stretch md:gap-7 md:px-4 md:py-6" aria-label="Navigasi">
@@ -64,13 +91,13 @@
     </nav>
 
     <div class="mt-auto hidden items-center gap-3 rounded-xl bg-white/5 p-3 md:flex">
-    <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e9efe9] font-bold text-[#0b3d31]" aria-hidden="true">{{ mb_strtoupper(mb_substr($namaUser, 0, 1)) }}</div>
-    <div class="min-w-0 flex-1">
-        <b class="block truncate font-semibold text-white">{{ $namaUser }}</b>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="cursor-pointer text-[0.82rem] hover:text-white hover:underline">Keluar</button>
-        </form>
+        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e9efe9] font-bold text-[#0b3d31]" aria-hidden="true">{{ mb_strtoupper(mb_substr($namaUser, 0, 1)) }}</div>
+        <div class="min-w-0 flex-1">
+            <b class="block truncate font-semibold text-white">{{ $namaUser }}</b>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="cursor-pointer text-[0.82rem] hover:text-white hover:underline">Keluar</button>
+            </form>
+        </div>
     </div>
-</div>
 </aside>
