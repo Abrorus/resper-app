@@ -4,6 +4,8 @@
 
 @section('content')
         <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]"><a href="#atas" id="crumb-keuangan" class="hover:text-[#13211e] hover:underline">Keuangan</a> / Laporan Keuangan</p>
+        @include('keuangan._tabs')
+        @include('keuangan._flash')
 
         {{-- Kepala halaman dan filter periode --}}
         <div class="mb-7 flex flex-col items-start gap-5">
@@ -134,44 +136,34 @@
             </div>
 
             <details id="log" class="mt-4 border-t border-[#dce3e0] pt-3.5">
-                <summary class="cursor-pointer font-semibold">Log koreksi <span id="log-count" class="font-medium text-[#5a6b66]"></span></summary>
-                <ul id="log-list" class="mt-3 flex flex-col gap-2.5"></ul>
-                <p id="log-empty" class="mt-3 text-[#5a6b66]">Belum ada koreksi. Pilih tombol Koreksi pada transaksi yang ingin diperbaiki.</p>
+                <summary class="cursor-pointer font-semibold">Log koreksi <span class="font-medium text-[#5a6b66]">({{ $jumlahLog }})</span></summary>
+                @forelse ($logs as $log)
+                    @if ($loop->first)<ul class="mt-3 flex flex-col gap-2.5">@endif
+                    <li class="rounded-lg bg-[#f1f4f2] px-3.5 py-2.5">
+                        <b>{{ $log->transaction_type }} {{ $log->label }}</b>
+                        <small class="block text-[#5a6b66]">{{ $log->action === 'hapus' ? 'Dihapus' : 'Dikoreksi' }} {{ $log->created_at->translatedFormat('d M Y, H.i') }} oleh {{ $log->user?->name ?? 'Pengguna' }}</small>
+                        @foreach ($log->changes() as $perubahan)<div>{{ $perubahan }}</div>@endforeach
+                    </li>
+                    @if ($loop->last)</ul>@endif
+                @empty
+                    <p class="mt-3 text-[#5a6b66]">Belum ada koreksi. Pilih tombol Koreksi pada transaksi yang ingin diperbaiki.</p>
+                @endforelse
+                @if ($jumlahLog > 0)
+                    <a href="{{ route('finance.corrections.index') }}" class="mt-3 inline-block font-semibold text-[#12795a] hover:underline">Lihat semua riwayat koreksi</a>
+                @endif
             </details>
         </section>
 
-        <p class="mt-6 flex flex-wrap items-center gap-3 text-[0.85rem] text-[#5a6b66]">
-            <span>Data contoh {{ $periodeData }}, belum terhubung ke database. Koreksi disimpan di browser ini.</span>
-            <button type="button" id="btn-data-awal" class="cursor-pointer text-[#13211e] underline">Kembalikan data awal</button>
+        <p class="mt-6 text-[0.85rem] text-[#5a6b66]">
+            @if ($periodeData)
+                Data dari database untuk transaksi {{ $periodeData }}. Laporan diperbarui setiap kali transaksi dicatat atau dikoreksi.
+            @else
+                Belum ada transaksi di database. Catat transaksi penjualan atau pengeluaran terlebih dahulu.
+            @endif
         </p>
 @endsection
 
 @push('modals')
-{{-- Formulir koreksi transaksi (use case Keuangan-4) --}}
-<dialog id="dialog-koreksi" aria-labelledby="judul-koreksi" class="m-auto w-[min(460px,calc(100vw-32px))] rounded-2xl p-0 text-[#13211e] shadow-2xl backdrop:bg-[#0b1e19]/45">
-    <form id="form-koreksi" class="flex flex-col gap-3.5 px-6.5 pb-5.5 pt-6.5" novalidate>
-        <h2 id="judul-koreksi" class="font-['Bricolage_Grotesque',sans-serif] text-[1.35rem] font-bold">Koreksi transaksi</h2>
-        <p id="koreksi-info" class="-mt-2 text-[0.92rem] text-[#5a6b66]"></p>
-        <label class="flex flex-col gap-1.5">
-            <span class="text-[0.92rem] font-medium">Keterangan</span>
-            <input id="k-ket" maxlength="60" autocomplete="off" class="rounded-lg border border-[#dce3e0] px-3 py-2.5 outline-none focus:border-[#0b3d31] focus:ring-3 focus:ring-[#0b3d31]/12 aria-invalid:border-[#c2362f] aria-invalid:ring-3 aria-invalid:ring-[#f9e5e3]">
-        </label>
-        <label class="flex flex-col gap-1.5">
-            <span id="k-sub-label" class="text-[0.92rem] font-medium">Kategori</span>
-            <select id="k-sub" class="rounded-lg border border-[#dce3e0] bg-white px-3 py-2.5 outline-none focus:border-[#0b3d31] focus:ring-3 focus:ring-[#0b3d31]/12"></select>
-        </label>
-        <label class="flex flex-col gap-1.5">
-            <span class="text-[0.92rem] font-medium">Nominal (Rp)</span>
-            <input id="k-nominal" type="number" inputmode="numeric" step="1000" class="rounded-lg border border-[#dce3e0] px-3 py-2.5 outline-none focus:border-[#0b3d31] focus:ring-3 focus:ring-[#0b3d31]/12 aria-invalid:border-[#c2362f] aria-invalid:ring-3 aria-invalid:ring-[#f9e5e3]">
-        </label>
-        <p id="k-pesan" role="alert" hidden class="rounded-lg px-3 py-2.5 text-[0.9rem] data-[jenis=error]:bg-[#f9e5e3] data-[jenis=error]:text-[#c2362f] data-[jenis=info]:bg-[#fbf1d9] data-[jenis=info]:text-[#7a5300]"></p>
-        <div class="mt-1 flex justify-end gap-2.5">
-            <button type="button" id="k-batal" class="cursor-pointer rounded-lg border border-[#dce3e0] bg-white px-3.5 py-2 hover:border-[#13211e]">Batal</button>
-            <button type="submit" class="cursor-pointer rounded-lg bg-[#0b3d31] px-4.5 py-2.5 font-semibold text-white hover:bg-[#12503f]">Simpan koreksi</button>
-        </div>
-    </form>
-</dialog>
-
 <div id="tip" hidden class="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-[calc(100%+12px)] whitespace-nowrap rounded-md bg-[#13211e] px-2.5 py-1.5 text-[0.85rem] text-white"></div>
 <div id="toasts" aria-live="polite" class="fixed inset-x-4 bottom-5 z-[60] flex flex-col items-stretch gap-2 md:left-auto md:right-5 md:items-end"></div>
 @endpush
@@ -179,11 +171,8 @@
 @push('scripts')
 <script>
 (function () {
-    const DATA_AWAL = @json($transaksi);
+    const data = @json($transaksi);
     const HARI_INI = @json($hariIni);
-    const KATEGORI = @json($kategori);
-    const METODE = @json($metodeBayar);
-    const KUNCI = 'resper-koreksi-v1';
     const PER_HALAMAN = 8;
     const NS = 'http://www.w3.org/2000/svg';
     const W = { up: '#12795a', down: '#c2362f', chrome: '#0b3d31', line: '#dce3e0', muted: '#5a6b66', kunyit: '#e6a417', ink: '#13211e' };
@@ -208,27 +197,11 @@
         pillMasuk: 'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#e2f1ea] px-2.5 py-0.5 text-[0.85rem] font-medium text-[#12795a] before:h-[7px] before:w-[7px] before:rounded-full before:bg-current',
         pillKeluar: 'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#f9e5e3] px-2.5 py-0.5 text-[0.85rem] font-medium text-[#c2362f] before:h-[7px] before:w-[7px] before:rounded-full before:bg-current',
         tagKoreksi: 'ml-2 inline-block rounded-full bg-[#fbf1d9] px-2 py-px align-[2px] text-[0.78rem] font-semibold text-[#8a5d00]',
-        tombolKecil: 'cursor-pointer whitespace-nowrap rounded-md border border-[#dce3e0] bg-white px-3 py-1 text-[0.88rem] hover:border-[#13211e]',
+        tombolKecil: 'inline-block cursor-pointer whitespace-nowrap rounded-md border border-[#dce3e0] bg-white px-3 py-1 text-[0.88rem] hover:border-[#13211e]',
         sel: 'block md:table-cell',
-        logItem: 'rounded-lg bg-[#f1f4f2] px-3.5 py-2.5',
         toast: 'max-w-[360px] rounded-xl bg-[#13211e] px-4 py-3 text-white shadow-xl transition duration-300 starting:translate-y-2 starting:opacity-0',
         batang: 'cursor-pointer hover:brightness-110',
     };
-
-    // ---------- Penyimpanan koreksi di browser ----------
-    function bacaSimpanan() {
-        try { return JSON.parse(localStorage.getItem(KUNCI)) || { ubah: {}, log: [] }; }
-        catch (e) { return { ubah: {}, log: [] }; }
-    }
-    function tulisSimpanan() {
-        try { localStorage.setItem(KUNCI, JSON.stringify(simpanan)); } catch (e) { /* penyimpanan tidak tersedia */ }
-    }
-    let simpanan = bacaSimpanan();
-    let data = [];
-    function muatData() {
-        data = DATA_AWAL.map(t => Object.assign({}, t, simpanan.ubah[t.id] || {}, { dikoreksi: !!simpanan.ubah[t.id] }));
-    }
-    muatData();
 
     // ---------- Utilitas ----------
     const rp = n => (n < 0 ? '-Rp ' : 'Rp ') + Math.abs(Math.round(n)).toLocaleString('id-ID');
@@ -474,7 +447,7 @@
                     '<small class="block text-[0.85rem] text-[#5a6b66]">' + (masuk ? 'Dibayar dengan ' + esc(t.sub) : 'Kategori ' + esc(t.sub.toLowerCase())) + '</small></td>' +
                     '<td class="' + KELAS.selJenis + '"><span class="' + (masuk ? KELAS.pillMasuk : KELAS.pillKeluar) + '">' + t.jenis + '</span></td>' +
                     '<td class="' + KELAS.selNominal + ' ' + (masuk ? KELAS.masuk : KELAS.keluar) + '">' + (masuk ? '+ ' : '- ') + rp(t.nominal) + '</td>' +
-                    '<td class="' + KELAS.selAksi + '"><button type="button" class="' + KELAS.tombolKecil + '" data-koreksi="' + t.id + '" aria-label="Koreksi ' + esc(t.ket) + '">Koreksi</button></td>' +
+                    '<td class="' + KELAS.selAksi + '"><a href="' + esc(t.url) + '" class="' + KELAS.tombolKecil + '" aria-label="Koreksi ' + esc(t.ket) + '">Koreksi</a></td>' +
                     '</tr>';
             }).join('');
         }
@@ -491,15 +464,6 @@
         $('#btn-csv').disabled = !rows.length;
     }
 
-    function gambarLog() {
-        const log = simpanan.log;
-        $('#log-count').textContent = '(' + log.length + ')';
-        $('#log-empty').hidden = log.length > 0;
-        $('#log-list').innerHTML = log.slice().reverse().map(l =>
-            '<li class="' + KELAS.logItem + '"><b>' + esc(l.ket) + '</b><small class="block text-[#5a6b66]">' + esc(l.waktu) + '</small>' + l.perubahan.map(p => '<div>' + esc(p) + '</div>').join('') + '</li>'
-        ).join('');
-    }
-
     // ---------- Render utama ----------
     function render() {
         const panjang = selisihHari(state.mulai, state.akhir) + 1;
@@ -513,7 +477,6 @@
         gambarAirTerjun(kini);
         gambarBerjalan(kini, panjang);
         gambarTabel(kini);
-        gambarLog();
     }
 
     // ---------- Filter periode ----------
@@ -597,108 +560,6 @@
         toast('File CSV berisi ' + rows.length + ' transaksi diunduh.');
     });
 
-    // ---------- Koreksi transaksi ----------
-    const dialog = $('#dialog-koreksi');
-    let sedangDikoreksi = null;
-    function pesanKoreksi(teks, jenis) {
-        const p = $('#k-pesan');
-        p.textContent = teks || '';
-        p.dataset.jenis = jenis || '';
-        p.hidden = !teks;
-    }
-    function bukaKoreksi(id) {
-        const t = data.find(x => x.id === id);
-        if (!t) return;
-        sedangDikoreksi = t;
-        const masuk = t.jenis === 'Penjualan';
-        $('#koreksi-info').textContent = t.jenis + ' pada ' + tglPanjang(t.tanggal) + ', pukul ' + t.jam + ' WIB.';
-        $('#k-ket').value = t.ket;
-        $('#k-sub-label').textContent = masuk ? 'Metode pembayaran' : 'Kategori';
-        $('#k-sub').innerHTML = (masuk ? METODE : KATEGORI).map(o => '<option' + (o === t.sub ? ' selected' : '') + '>' + esc(o) + '</option>').join('');
-        $('#k-nominal').value = t.nominal;
-        $('#k-nominal').removeAttribute('aria-invalid');
-        $('#k-ket').removeAttribute('aria-invalid');
-        pesanKoreksi('');
-        dialog.showModal();
-        $('#k-nominal').focus();
-        $('#k-nominal').select();
-    }
-    $('#baris').addEventListener('click', e => {
-        const b = e.target.closest('[data-koreksi]');
-        if (b) bukaKoreksi(b.dataset.koreksi);
-    });
-    $('#k-batal').addEventListener('click', () => { dialog.close(); toast('Koreksi dibatalkan. Tidak ada data yang diubah.'); });
-    dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
-    $('#form-koreksi').addEventListener('submit', e => {
-        e.preventDefault();
-        const t = sedangDikoreksi;
-        const ket = $('#k-ket').value.trim();
-        const sub = $('#k-sub').value;
-        const nominalTeks = $('#k-nominal').value.trim();
-        const nominal = Number(nominalTeks);
-        if (!ket) {
-            $('#k-ket').setAttribute('aria-invalid', 'true');
-            return pesanKoreksi('Keterangan tidak boleh kosong.', 'error');
-        }
-        $('#k-ket').removeAttribute('aria-invalid');
-        const nominalSalah = !nominalTeks || !Number.isFinite(nominal) || nominal <= 0 || !Number.isInteger(nominal);
-        if (nominalSalah) {
-            $('#k-nominal').setAttribute('aria-invalid', 'true');
-            return pesanKoreksi('Data koreksi tidak valid. Nominal tidak boleh kosong, nol, negatif, atau berkoma.', 'error');
-        }
-        $('#k-nominal').removeAttribute('aria-invalid');
-
-        const perubahan = [];
-        if (ket !== t.ket) perubahan.push('Keterangan "' + t.ket + '" menjadi "' + ket + '"');
-        if (sub !== t.sub) perubahan.push((t.jenis === 'Penjualan' ? 'Metode ' : 'Kategori ') + t.sub + ' menjadi ' + sub);
-        if (nominal !== t.nominal) perubahan.push('Nominal ' + rp(t.nominal) + ' menjadi ' + rp(nominal));
-        if (!perubahan.length) return pesanKoreksi('Tidak ada perubahan. Ubah minimal satu data sebelum menyimpan.', 'info');
-
-        simpanan.ubah[t.id] = { ket: ket, sub: sub, nominal: nominal };
-        simpanan.log.push({
-            id: t.id,
-            ket: t.jenis + ' ' + ket + ' (' + tglPendek(t.tanggal) + ')',
-            waktu: 'Dikoreksi ' + new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }),
-            perubahan: perubahan
-        });
-        tulisSimpanan();
-        muatData();
-        state.sorotId = t.id;
-        dialog.close();
-        render();
-        toast('Koreksi tersimpan. Laporan keuangan sudah diperbarui.');
-    });
-
-    $('#btn-data-awal').addEventListener('click', () => {
-        if (!simpanan.log.length) return toast('Data sudah dalam kondisi awal.');
-        simpanan = { ubah: {}, log: [] };
-        tulisSimpanan();
-        muatData();
-        render();
-        toast('Semua koreksi dihapus. Data kembali ke kondisi awal.');
-    });
-
-    // ---------- Menu samping ----------
-    function keRiwayat() {
-        $('#riwayat').scrollIntoView({ block: 'start' });
-        $('#riwayat').focus({ preventScroll: true });
-    }
-    document.querySelectorAll('[data-aksi]').forEach(a => a.addEventListener('click', e => {
-        e.preventDefault();
-        const aksi = a.dataset.aksi;
-        if (aksi === 'laporan') return window.scrollTo({ top: 0 });
-        if (aksi === 'penjualan' || aksi === 'pengeluaran') {
-            aturTab(aksi === 'penjualan' ? 'Penjualan' : 'Pengeluaran');
-            state.halaman = 1;
-            gambarTabel(hitung(state.mulai, state.akhir));
-            keRiwayat();
-            return;
-        }
-        if (aksi === 'koreksi') {
-            keRiwayat();
-            toast('Pilih tombol Koreksi pada transaksi yang ingin diperbaiki.');
-        }
-    }));
     $('#crumb-keuangan').addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0 }); });
 
     // ---------- Tooltip grafik ----------
