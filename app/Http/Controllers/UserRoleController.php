@@ -28,7 +28,7 @@ class UserRoleController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('akun.role.index', [
+        return view('akun.role', [
             'users' => $users,
             'roles' => UserRole::cases(),
             'statuses' => AccountStatus::cases(),
