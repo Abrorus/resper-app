@@ -51,6 +51,7 @@
     </div>
 
     <!-- ADD SCHEDULE BUTTON -->
+    @can('kelola-jadwal')
     <div class="flex justify-end mb-5">
 
         <button
@@ -63,6 +64,7 @@
         </button>
 
     </div>
+    @endcan
 
     @if($staffMembers->isEmpty())
         <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg mb-5">
@@ -121,7 +123,7 @@
 
                             <!-- ACTION BUTTONS -->
                             <td class="p-4">
-
+                                @can('kelola-jadwal')
                                 <div class="flex items-center gap-2">
 
                                     <!-- EDIT BUTTON -->
@@ -152,7 +154,7 @@
                                     </form>
 
                                 </div>
-
+                                @endcan
                             </td>
 
                         </tr>

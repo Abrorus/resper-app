@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
+use App\Enums\AccountStatus;
+use App\Enums\UserRole;
+
 /**
  * @extends Factory<User>
  */
@@ -42,4 +45,24 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function manager(): static
+{
+    return $this->state(fn (array $attributes) => ['role' => UserRole::Manager->value]);
+}
+
+public function cashier(): static
+{
+    return $this->state(fn (array $attributes) => ['role' => UserRole::Cashier->value]);
+}
+
+public function staff(): static
+{
+    return $this->state(fn (array $attributes) => ['role' => UserRole::Staff->value]);
+}
+
+public function blocked(): static
+{
+    return $this->state(fn (array $attributes) => ['account_status' => AccountStatus::Blocked->value]);
+}
 }
