@@ -21,10 +21,10 @@
         ['label' => 'Keuangan', 'route' => 'finance.report', 'pola' => 'finance.*',
          'ikon' => '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>',
          'sub' => [
-             ['label' => 'Transaksi Penjualan', 'route' => 'finance.report', 'aksi' => 'penjualan'],
-             ['label' => 'Transaksi Pengeluaran', 'route' => 'finance.report', 'aksi' => 'pengeluaran'],
-             ['label' => 'Laporan Keuangan', 'route' => 'finance.report'],
-             ['label' => 'Koreksi Transaksi', 'route' => 'finance.report', 'aksi' => 'koreksi'],
+             ['label' => 'Transaksi Penjualan', 'route' => 'finance.sales.index', 'pola' => 'finance.sales.*'],
+             ['label' => 'Transaksi Pengeluaran', 'route' => 'finance.expenses.index', 'pola' => 'finance.expenses.*'],
+             ['label' => 'Laporan Keuangan', 'route' => 'finance.report', 'pola' => 'finance.report'],
+             ['label' => 'Koreksi Transaksi', 'route' => 'finance.corrections.index', 'pola' => 'finance.corrections.*'],
          ]],
     ];
 
@@ -54,8 +54,7 @@
                 <div class="mb-1.5 ml-5 mt-1 hidden flex-col border-l border-white/15 pl-5 md:flex">
                     @foreach ($item['sub'] as $sub)
                         <a href="{{ $tautan($sub['route'], $sub['aksi'] ?? null) }}"
-                           @isset($sub['aksi']) data-aksi="{{ $sub['aksi'] }}" @endisset
-                           @if (! isset($sub['aksi']) && request()->routeIs($sub['route'])) aria-current="page" @endif
+                           @if (request()->routeIs($sub['pola'] ?? $sub['route'])) aria-current="page" @endif
                            class="rounded-lg px-2.5 py-2 text-[0.92rem] hover:bg-[#12503f] hover:text-white aria-[current=page]:bg-[#e6a417]/15 aria-[current=page]:font-semibold aria-[current=page]:text-white aria-[current=page]:shadow-[inset_3px_0_0_#e6a417]">{{ $sub['label'] }}</a>
                     @endforeach
                 </div>
