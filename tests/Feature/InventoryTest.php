@@ -14,8 +14,7 @@ class InventoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->manager()->create());
     }
 
     private function payload(array $override = []): array
