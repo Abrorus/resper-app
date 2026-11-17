@@ -6,6 +6,7 @@
          'ikon' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
          'sub' => [
              ['label' => 'Profil', 'route' => 'akun.index'],
+             ['label' => 'Kelola Pengguna', 'route' => 'akun.users.index', 'izin' => 'kelola-pengguna'],
              ['label' => 'Kelola Role', 'route' => 'akun.role.index', 'izin' => 'kelola-role'],
          ]],
         ['label' => 'Pemesanan', 'route' => 'order.pesanan', 'pola' => 'order.*', 'izin' => 'kelola-pesanan',

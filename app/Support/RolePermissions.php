@@ -11,6 +11,7 @@ final class RolePermissions
     public const MAP = [
         // Modul Akun
         'kelola-role' => [UserRole::Manager],                       // akun.role.*
+        'kelola-pengguna' => [UserRole::Manager],                   // akun.users.*
 
         // Modul Inventaris
         'kelola-inventaris' => [UserRole::Manager],                 // inventory.*
