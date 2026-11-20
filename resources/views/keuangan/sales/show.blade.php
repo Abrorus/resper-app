@@ -17,7 +17,7 @@
 
 @section('content')
     <div class="no-print">
-        <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]"><a href="{{ route('finance.report') }}" class="hover:text-[#13211e] hover:underline">Keuangan</a> / <a href="{{ route('finance.sales.index') }}" class="hover:text-[#13211e] hover:underline">Transaksi Penjualan</a> / Struk</p>
+        <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]">Keuangan / <a href="{{ route('finance.sales.index') }}" class="hover:text-[#13211e] hover:underline">Transaksi Penjualan</a> / Struk</p>
         @include('keuangan._tabs')
         @include('keuangan._flash')
     </div>

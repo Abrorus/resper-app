@@ -93,7 +93,7 @@ class ExpenseTransactionController extends Controller
             ]);
         });
 
-        return redirect()->route('finance.expenses.index')
+        return redirect()->route('finance.report')
             ->with('success', 'Koreksi transaksi pengeluaran berhasil disimpan.');
     }
 
@@ -113,7 +113,7 @@ class ExpenseTransactionController extends Controller
             $expense->delete();
         });
 
-        return redirect()->route('finance.expenses.index', $request->only('cari', 'kategori', 'page'))
+        return redirect()->route('finance.report')
             ->with('success', 'Transaksi pengeluaran berhasil dihapus.');
     }
 

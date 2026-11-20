@@ -3,7 +3,7 @@
 @section('title', 'Catat Pengeluaran')
 
 @section('content')
-    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]"><a href="{{ route('finance.report') }}" class="hover:text-[#13211e] hover:underline">Keuangan</a> / <a href="{{ route('finance.expenses.index') }}" class="hover:text-[#13211e] hover:underline">Transaksi Pengeluaran</a> / Catat</p>
+    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]">Keuangan / <a href="{{ route('finance.expenses.index') }}" class="hover:text-[#13211e] hover:underline">Transaksi Pengeluaran</a> / Catat</p>
     @include('keuangan._tabs')
 
     <div class="max-w-2xl">

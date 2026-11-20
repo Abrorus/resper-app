@@ -119,7 +119,7 @@ class SalesTransactionController extends Controller
             ]);
         });
 
-        return redirect()->route('finance.sales.index')->with('success', 'Koreksi transaksi penjualan berhasil disimpan.');
+        return redirect()->route('finance.report')->with('success', 'Koreksi transaksi penjualan berhasil disimpan.');
     }
 
     /** Delete: batalkan pencatatan, Order kembali muncul di daftar belum tercatat. */
@@ -138,7 +138,7 @@ class SalesTransactionController extends Controller
             $sale->delete();
         });
 
-        return redirect()->route('finance.sales.index')
+        return redirect()->route('finance.report')
             ->with('success', 'Transaksi penjualan dihapus. Order kembali ke daftar belum tercatat.');
     }
 

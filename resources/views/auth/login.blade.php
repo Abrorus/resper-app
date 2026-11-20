@@ -24,6 +24,10 @@
             <h1 class="text-2xl font-semibold">Welcome back</h1>
             <p class="mt-1 text-lg font-semibold">Please login to your account</p>
 
+            @if (session('success'))
+                <div class="mt-6 rounded-lg border border-[#27AE60]/30 bg-[#27AE60]/10 px-4 py-3 text-sm text-[#1d6b3e]">{{ session('success') }}</div>
+            @endif
+
             <form method="POST" action="{{ route('login.store') }}" class="mt-8 space-y-5" novalidate>
                 @csrf
 
@@ -84,7 +88,7 @@
 
                 <p class="text-xs">
                     Don't have an account?
-                    <a href="{{ url('/register') }}" class="font-semibold text-[#27AE60] hover:underline">Sign Up</a>
+                    <a href="{{ route('register') }}" class="font-semibold text-[#27AE60] hover:underline">Sign Up</a>
                 </p>
             </form>
         </div>

@@ -33,7 +33,9 @@ class FinanceSeeder extends Seeder
         }
 
         mt_srand(2026);
-        $kasir = User::query()->orderBy('id')->value('id');
+        // Transaksi dicatat atas nama Kasir; jika belum ada, pakai pengguna pertama.
+        $kasir = User::query()->where('role', 'cashier')->orderBy('id')->value('id')
+            ?? User::query()->orderBy('id')->value('id');
         $hariIni = now()->startOfDay();
 
         DB::transaction(function () use ($kasir, $hariIni) {

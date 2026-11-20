@@ -3,13 +3,13 @@
 @section('title', 'Transaksi Pengeluaran')
 
 @section('content')
-    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]"><a href="{{ route('finance.report') }}" class="hover:text-[#13211e] hover:underline">Keuangan</a> / Transaksi Pengeluaran</p>
+    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]">Keuangan / Transaksi Pengeluaran</p>
     @include('keuangan._tabs')
 
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1 class="font-['Bricolage_Grotesque',sans-serif] text-[2.1rem] font-bold leading-tight tracking-tight">Transaksi Pengeluaran</h1>
-            <p class="mt-1.5 text-[#5a6b66]">Biaya operasional restoran yang dicatat oleh Kasir.</p>
+            <p class="mt-1.5 text-[#5a6b66]">Biaya operasional restoran yang dicatat oleh Kasir. Kesalahan input dikoreksi oleh Manajer melalui Laporan Keuangan.</p>
         </div>
         <a href="{{ route('finance.expenses.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-[#0b3d31] px-4.5 py-2.5 font-semibold text-white hover:bg-[#12503f]">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -77,11 +77,13 @@
                             <td class="hidden text-[#5a6b66] md:table-cell md:p-3">{{ $e->user?->name ?? 'Tidak diketahui' }}</td>
                             <td class="col-start-2 row-start-1 whitespace-nowrap text-right font-semibold tabular-nums text-[#c2362f] md:table-cell md:p-3">- Rp {{ number_format($e->amount, 0, ',', '.') }}</td>
                             <td class="col-start-2 row-start-2 md:table-cell md:w-px md:p-3">
+                                @can('koreksi-transaksi')
                                 <div class="flex justify-end gap-1.5">
                                     <a href="{{ route('finance.expenses.edit', $e) }}" class="whitespace-nowrap rounded-md border border-[#dce3e0] bg-white px-3 py-1 text-[0.88rem] hover:border-[#13211e]">Koreksi</a>
                                     <button type="button" data-hapus="{{ route('finance.expenses.destroy', $e) }}" data-label="{{ $e->label() }} ({{ $e->transaction_date->format('d/m/Y') }})"
                                             class="cursor-pointer whitespace-nowrap rounded-md border border-[#dce3e0] bg-white px-3 py-1 text-[0.88rem] text-[#c2362f] hover:border-[#c2362f]">Hapus</button>
                                 </div>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach

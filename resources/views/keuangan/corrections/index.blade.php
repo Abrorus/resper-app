@@ -3,15 +3,13 @@
 @section('title', 'Koreksi Transaksi')
 
 @section('content')
-    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]"><a href="{{ route('finance.report') }}" class="hover:text-[#13211e] hover:underline">Keuangan</a> / Koreksi Transaksi</p>
+    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]">Keuangan / Koreksi Transaksi</p>
     @include('keuangan._tabs')
 
     <div class="mb-6">
         <h1 class="font-['Bricolage_Grotesque',sans-serif] text-[2.1rem] font-bold leading-tight tracking-tight">Koreksi Transaksi</h1>
         <p class="mt-1.5 max-w-2xl text-[#5a6b66]">
             Riwayat setiap perubahan dan penghapusan transaksi. Untuk mengoreksi, buka
-            <a href="{{ route('finance.sales.index') }}" class="font-semibold text-[#12795a] hover:underline">Transaksi Penjualan</a>,
-            <a href="{{ route('finance.expenses.index') }}" class="font-semibold text-[#12795a] hover:underline">Transaksi Pengeluaran</a>, atau
             <a href="{{ route('finance.report') }}" class="font-semibold text-[#12795a] hover:underline">Laporan Keuangan</a>, lalu pilih Koreksi pada transaksi yang salah.
         </p>
     </div>

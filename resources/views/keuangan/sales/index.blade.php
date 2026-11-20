@@ -5,7 +5,7 @@
 @php $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.'); @endphp
 
 @section('content')
-    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]"><a href="{{ route('finance.report') }}" class="hover:text-[#13211e] hover:underline">Keuangan</a> / Transaksi Penjualan</p>
+    <p class="mb-1.5 text-[0.9rem] text-[#5a6b66]">Keuangan / Transaksi Penjualan</p>
     @include('keuangan._tabs')
 
     <div class="mb-6">
@@ -81,7 +81,7 @@
     {{-- Riwayat penjualan --}}
     <section class="rounded-xl border border-[#dce3e0] bg-white px-4 pb-4 pt-5 md:px-6 md:pb-5" aria-labelledby="judul-riwayat">
         <h2 id="judul-riwayat" class="font-['Bricolage_Grotesque',sans-serif] text-xl font-semibold">Riwayat transaksi penjualan</h2>
-        <p class="mb-3 mt-0.5 text-[0.92rem] text-[#5a6b66]">Transaksi yang salah input dapat dikoreksi atau dihapus. Order dari transaksi yang dihapus kembali ke daftar di atas.</p>
+        <p class="mb-3 mt-0.5 text-[0.92rem] text-[#5a6b66]">Transaksi yang salah input dikoreksi oleh Manajer melalui Laporan Keuangan.</p>
 
         @if ($sales->isEmpty())
             <p class="rounded-lg border border-dashed border-[#dce3e0] px-6 py-10 text-center text-[#5a6b66]">Belum ada transaksi penjualan yang tercatat.</p>
@@ -109,9 +109,11 @@
                             <td class="col-start-2 row-start-2 md:table-cell md:w-px md:p-3">
                                 <div class="flex justify-end gap-1.5">
                                     <a href="{{ route('finance.sales.show', $s) }}" class="whitespace-nowrap rounded-md border border-[#dce3e0] bg-white px-3 py-1 text-[0.88rem] hover:border-[#13211e]">Struk</a>
+                                    @can('koreksi-transaksi')
                                     <a href="{{ route('finance.sales.edit', $s) }}" class="whitespace-nowrap rounded-md border border-[#dce3e0] bg-white px-3 py-1 text-[0.88rem] hover:border-[#13211e]">Koreksi</a>
                                     <button type="button" data-hapus="{{ route('finance.sales.destroy', $s) }}" data-label="{{ $s->label() }}"
                                             class="cursor-pointer whitespace-nowrap rounded-md border border-[#dce3e0] bg-white px-3 py-1 text-[0.88rem] text-[#c2362f] hover:border-[#c2362f]">Hapus</button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
